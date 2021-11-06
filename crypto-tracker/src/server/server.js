@@ -27,6 +27,24 @@ app.get('/list', function(req, resp) {
     })
 });
 
+app.get('/coin/:cid/', function(req, resp) {
+
+  const cid = req.params["cid"];
+  var url = Gecko_API_URL + `coins/${cid}/`;
+
+  axios
+    .get(url)
+    .then(res => {
+
+    resp.send(res.data);
+
+    })
+    .catch(error => {
+    console.error(error)
+    resp.send("No information")
+    })
+});
+
 // Start server at selected PORT
 app.listen(port);
 console.log('Server started at http://localhost:' + port);
