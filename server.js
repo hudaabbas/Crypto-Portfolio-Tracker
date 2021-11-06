@@ -10,7 +10,7 @@ const Gecko_API_URL = "https://api.coingecko.com/api/v3/";
 app.use(express.json());
 //app.use(express.urlencoded({ extended: true })); //Might need if using URL encoded forms in frontend
 
-app.get('/coins/list', function(req, resp) {
+app.get('/list', function(req, resp) {
 
   var url = Gecko_API_URL + '/coins/list'
 
@@ -19,6 +19,7 @@ app.get('/coins/list', function(req, resp) {
     .then(res => {
 
     console.log(resp)
+    resp.send(res.data);
 
     })
     .catch(error => {
