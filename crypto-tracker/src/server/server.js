@@ -45,6 +45,149 @@ app.get('/coin/:cid/', function(req, resp) {
     })
 });
 
+// Past Trends
+app.get('/trend/:cid/', function(req, resp) {
+  const cid = req.params["cid"];
+  var url = Gecko_API_URL + `coins/${cid}/market_chart?vs_currency=CAD&days=30&interval=daily`;
+
+  // Trendline
+  axios
+    .get(url)
+    .then(res => {
+
+      var prices = res.data['prices'];
+
+      var sum = 0;
+
+      for( price in prices){
+        console.log(prices[price][1]);
+
+        sum+=prices[price][1];
+      }
+      console.log('avg');
+      console.log(sum/30);
+
+    resp.send(prices);
+
+    })
+    .catch(error => {
+    console.error(error)
+    resp.send("No information")
+    })
+});
+
+//Community Stats
+app.get('/community/:cid/', function(req, resp) {
+  const cid = req.params["cid"];
+  const date = `30-12-2017`
+  var url = Gecko_API_URL + `/coins/${cid}/history?date=${date}`;
+
+  // Community Stats
+  axios
+    .get(url)
+    .then(res => {
+
+      var community_data = res.data["community_data"];
+      var public_interest_stats = res.data["public_interest_stats"];
+
+    resp.send([community_data, public_interest_stats]);
+
+    })
+    .catch(error => {
+    console.error(error)
+    resp.send("No information")
+    })
+});
+
+// Profit/Loss
+app.get('/pl/coin/:cid/amount/:amnt/', function(req, resp) {
+
+  const cid = req.params["cid"]; // Can be multiple -- seperated by %2C in API call
+  const amnt = req.params["amnt"];
+  const granularity = 30;
+
+  var diff;
+
+  // Use community data in coins/id/history to make expected return
+
+  var url = Gecko_API_URL + `simple/price?ids=${cid}&vs_currencies=CAD`;
+
+  axios
+    .get(url)
+    .then(res => {
+
+    var coin = res.data[cid];
+    var price_now = coin['cad'];
+
+    console.log(price_now);
+
+    pl = price_now - amnt;
+
+    console.log(diff);
+
+    url = Gecko_API_URL + `coins/${cid}/market_chart?vs_currency=CAD&days=${granularity}&interval=daily`;
+
+    axios
+      .get(url)
+      .then(res => {
+
+        var prices = res.data['prices'];
+
+        var sum = 0;
+
+        for( price in prices){
+          sum+=prices[price][1];
+        }
+
+        var future_val = sum/30;
+
+        var caps = res.data['market_caps'];
+
+        var market_cap = 0;
+
+        for( cap in caps){
+          market_cap+=caps[cap][1];
+        }
+
+        var market_cap_future = market_cap/30;
+
+        app.get('/community/:cid/', function(req, resp) {
+          const cid = req.params["cid"];
+          const date = `30-12-2017`
+          var url = Gecko_API_URL + `/coins/${cid}/history?date=${date}`;
+
+          // Community Stats
+          axios
+            .get(url)
+            .then(res => {
+
+              var community_data = res.data["community_data"];
+              var public_interest_stats = res.data["public_interest_stats"];
+
+            resp.send([pl, future_val, market_cap_future, community_data, public_interest_stats]);
+
+            })
+            .catch(error => {
+            console.error(error)
+            resp.send("No information")
+            })
+        });
+
+
+
+      })
+      .catch(error => {
+      console.error(error)
+      resp.send("No information")
+    })
+
+    })
+    .catch(error => {
+    console.error(error)
+    resp.send("No information")
+    });
+});
+
 // Start server at selected PORT
 app.listen(port);
 console.log('Server started at http://localhost:' + port);
