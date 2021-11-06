@@ -1,5 +1,5 @@
-import express from "express";
-import axios from "axios";
+const express = require('express');
+const axios = require('axios');
 
 const app = express();
 const port = process.env.PORT || 8080; // Choosing PORT
@@ -10,18 +10,16 @@ const Gecko_API_URL = "https://api.coingecko.com/api/v3/";
 app.use(express.json());
 //app.use(express.urlencoded({ extended: true })); //Might need if using URL encoded forms in frontend
 
-// GET Request - Requires URL parameters (SPACE replaced with underscore)
-// Returns information summarized by inference API
 app.get('/coins/list', function(req, resp) {
-  // This is for using the newsURL
+
+  var url = Gecko_API_URL + '/coins/list'
 
   axios
-    .get(news_url, news_options)
+    .get(url)
     .then(res => {
 
-    //   console.log(news_q)
+    console.log(resp)
 
-    //   console.log(res.data);
     })
     .catch(error => {
     console.error(error)
@@ -31,4 +29,3 @@ app.get('/coins/list', function(req, resp) {
 // Start server at selected PORT
 app.listen(port);
 console.log('Server started at http://localhost:' + port);
-
